@@ -21,24 +21,22 @@ app.controller('myController', function ($scope) {
             strikebonus: 0,
             sparebonus: 0,
             bowl2: 0,
+            bowl2show: false,
             bowl3: 0,
+            bowl3show: false,
             frametotal: 0,
             aggtotal: 0,
             framenum: i + 1,
             key: i
         })
     }
-    myData[9].bowl3 = 0;
     $scope.calcFrame = function (frame) {
-        if (frame.bowl1 > 10 || frame.bowl1 < 0) {
-            alert("Scores can only be between 0 and 10. Input again.");
-            return false;
-        } else if ((frame.bowl2 > 10 - frame.bowl1 || frame.bowl2 < 0) && frame.key < 9) {
-            alert("Please input a score between " + 0 + " and " + (10 - frame.bowl1) + ".");
-            return false;
+        if (frame.bowl1 === 10 && frame.key !== 9) {
+            frame.bowl2 = 0;
         }
         myData[frame.key].frametotal = frame.bowl1 + frame.bowl2;
         for (var i = 0; i < myData.length; i++) {
+            showCheck(myData[i]);
             if (myData[i].bowl1 === 10) {
                 strikeCalculator(myData[i]);
                 myData[i].sparebonus = 0;
@@ -91,6 +89,18 @@ app.controller('myController', function ($scope) {
             myData[frame.key].sparebonus = myData[frame.key].bowl3;
         } else {
             myData[frame.key].sparebonus = myData[frame.key + 1].bowl1;
+        }
+    }
+    var showCheck = function (frame) {
+        if (frame.key === 9 && frame.frametotal > 9){
+            frame.bowl2show = true;
+            frame.bowl3show = true;
+        } else if (frame.bowl1 === 10) {
+            frame.bowl2show = false;
+            frame.bowl3show = false;
+        } else {
+            frame.bowl2show = true;
+            frame.bowl3show = false;
         }
     }
     database.ref().child('/scores/0').set(myData);

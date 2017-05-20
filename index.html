@@ -46,20 +46,24 @@
     <div class="container" ng-controller='myController'>
         <br><br><br>
         <div ng-repeat='frame in scoreData'>
-            <div class='col-xs-2'>
+            <div class='col-xs-12 col-sm-3'>
                 <h3>Frame {{frame.framenum}}</h3>
                 <div class='form-group'>
                     <label for="">Bowl 1</label>
                     <input type="number" ng-model='frame.bowl1' class="form-control" ng-keyup = 'calcFrame(frame)'>
+                </div>
+                <div class="form-group" ng-show = 'frame.bowl2show'>
                     <label for="">Bowl 2</label>
                     <input type="number" ng-model='frame.bowl2' class="form-control" ng-keyup = 'calcFrame(frame)'>
+                </div>
+                <div class="form-group" ng-show = 'frame.bowl3show'>
                     <label for="">Bowl 3</label>
                     <input type="number" ng-model='frame.bowl3' class="form-control" ng-keyup = 'calcFrame(frame)'>
-                    <h4>Frame: {{frame.frametotal}}</h4>
-                    <h4>Agg Total: {{frame.aggtotal}}</h4>
-                    <h4>Spare: {{frame.sparebonus}}</h4>
-                    <h4>Strike: {{frame.strikebonus}}</h4>
                 </div>
+                <h4>Frame: {{frame.frametotal}}</h4>
+                <h4>Agg Total: {{frame.aggtotal}}</h4>
+                <h4>Spare: {{frame.sparebonus}}</h4>
+                <h4>Strike: {{frame.strikebonus}}</h4>
             </div>
         </div>
     </div>
