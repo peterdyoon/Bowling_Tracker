@@ -48,22 +48,43 @@
         <div ng-repeat='frame in scoreData'>
             <div class='col-xs-12 col-sm-3'>
                 <h3>Frame {{frame.framenum}}</h3>
-                <div class='form-group'>
-                    <label for="">Bowl 1</label>
-                    <input type="number" ng-model='frame.bowl1' class="form-control" ng-keyup = 'calcFrame(frame)'>
+                <div class = 'col-xs-6'>
+                    <h4>Bowl 1: {{frame.bowl1}}</h4>
+                    <h4 ng-show = 'frame.bowl2tab'>Bowl 2: {{frame.bowl2}}</h4>
+                    <h4 ng-show = 'frame.bowl3tab'>Bowl 3: {{frame.bowl3}}</h4>
+                    <div class = 'row'>
+                        <div class = 'col-xs-4 tabs' ng-class = '{active:frame.activetab === 1}' ng-click = 'selectTab(frame, 1)'>
+                            1
+                        </div>
+                        <div class = 'col-xs-4 tabs' ng-class = '{active:frame.activetab === 2}' ng-show = 'frame.bowl2tab' ng-click = 'selectTab(frame, 2)'>
+                            2
+                        </div>
+                        <div class = 'col-xs-4 tabs' ng-class = '{active:frame.activetab === 3}' ng-show = 'frame.bowl3tab' ng-click = 'selectTab(frame, 3)'>
+                            3
+                        </div>
+                    </div>
+                    <div class = 'row' ng-show = 'frame.activetab === 1'>
+                        <div ng-repeat = 'calc in frame.bowl1Pad' class = 'col-xs-4 score' ng-click = 'frame.bowl1 = calcTranslator(calc); calcFrame(frame); frame.bowl2Pad = spareCalcMaker(frame)'>
+                            {{calc}}
+                        </div>
+                    </div>
+                    <div class = 'row' ng-show = 'frame.activetab === 2'>
+                        <div ng-repeat = 'calc in frame.bowl2Pad track by $index' class = 'col-xs-4 score' ng-click = 'frame.bowl2 = calcTranslator(calc); calcFrame(frame); frame.bowl3Pad = spareCalcMaker(frame)'>
+                            {{calc}}
+                        </div>
+                    </div>
+                    <div class = 'row' ng-show = 'frame.activetab === 3'>
+                        <div ng-repeat = 'calc in frame.bowl3Pad' class = 'col-xs-4 score' ng-click = 'frame.bowl3 = calcTranslator(calc); calcFrame(frame)'>
+                            {{calc}}
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group" ng-show = 'frame.bowl2show'>
-                    <label for="">Bowl 2</label>
-                    <input type="number" ng-model='frame.bowl2' class="form-control" ng-keyup = 'calcFrame(frame)'>
+                <div class = 'col-xs-6'>
+                    <h6>Frame: {{frame.frametotal}}</h6>
+                    <h6>Agg Total: {{frame.aggtotal}}</h6>
+                    <h6>Spare: {{frame.sparebonus}}</h6>
+                    <h6>Strike: {{frame.strikebonus}}</h6>
                 </div>
-                <div class="form-group" ng-show = 'frame.bowl3show'>
-                    <label for="">Bowl 3</label>
-                    <input type="number" ng-model='frame.bowl3' class="form-control" ng-keyup = 'calcFrame(frame)'>
-                </div>
-                <h4>Frame: {{frame.frametotal}}</h4>
-                <h4>Agg Total: {{frame.aggtotal}}</h4>
-                <h4>Spare: {{frame.sparebonus}}</h4>
-                <h4>Strike: {{frame.strikebonus}}</h4>
             </div>
         </div>
     </div>

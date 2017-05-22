@@ -21,22 +21,66 @@ app.controller('myController', function ($scope) {
             strikebonus: 0,
             sparebonus: 0,
             bowl2: 0,
-            bowl2show: false,
+            bowl2tab: false,
             bowl3: 0,
-            bowl3show: false,
+            activetab: 1,
+            bowl3tab: false,
             frametotal: 0,
             aggtotal: 0,
             framenum: i + 1,
-            key: i
+            key: i, 
+            bowl1Pad: [1, 2, 3, 4, 5, 6, 7, 8, 9, 'X', 0,], 
+            bowl2Pad: [],
+            bowl3Pad: []
         })
+    }
+    $scope.spareCalcMaker = function(frame) {
+        var dumArray = [];
+        var myrange = 0
+        if (frame.bowl1 === 10 && frame.bowl2 === 10) {
+            return frame.bowl1Pad;
+        } else if (frame.bowl1 === 10 && frame.activetab === 1) {
+            return frame.bowl1Pad;
+        } else if (frame.bowl1 === 10 && frame.activetab === 2) {
+            myrange = 10 - frame.bowl2;
+        } else {
+            myrange = 10 - frame.bowl1;
+        }
+        for (var i = 1; i < myrange; i++) {
+            dumArray.push(i);
+        }
+//        for (var i = 1; i < 10; i++) {
+//            if (i < myrange) {
+//                dumArray.push(i);
+//            } else {
+//                dumArray.push('');
+//            }
+//        }
+        dumArray.push(0);
+        dumArray.push('/');
+        return dumArray;
+    }
+    $scope.calcTranslator = function(calc) {
+        if (typeof calc === 'string') {
+            if (calc.toLowerCase() === 'x') {
+                return 10;
+            } 
+        } else {
+            return calc;
+        }
+        return false;
+    }
+    $scope.selectTab = function(frame, num) {
+        frame.activetab = num;
+        return false;
     }
     $scope.calcFrame = function (frame) {
         if (frame.bowl1 === 10 && frame.key !== 9) {
             frame.bowl2 = 0;
         }
-        myData[frame.key].frametotal = frame.bowl1 + frame.bowl2;
+        myData[frame.key].frametotal = frame.bowl1 + frame.bowl2 + frame.bowl3;
+        showCheck(myData[frame.key]);
         for (var i = 0; i < myData.length; i++) {
-            showCheck(myData[i]);
             if (myData[i].bowl1 === 10) {
                 strikeCalculator(myData[i]);
                 myData[i].sparebonus = 0;
@@ -93,14 +137,14 @@ app.controller('myController', function ($scope) {
     }
     var showCheck = function (frame) {
         if (frame.key === 9 && frame.frametotal > 9){
-            frame.bowl2show = true;
-            frame.bowl3show = true;
+            frame.bowl2tab = true;
+            frame.bowl3tab = true;
         } else if (frame.bowl1 === 10) {
-            frame.bowl2show = false;
-            frame.bowl3show = false;
+            frame.bowl2tab = false;
+            frame.bowl3tab = false;
         } else {
-            frame.bowl2show = true;
-            frame.bowl3show = false;
+            frame.bowl2tab = true;
+            frame.bowl3tab = false;
         }
     }
     database.ref().child('/scores/0').set(myData);

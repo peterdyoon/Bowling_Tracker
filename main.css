@@ -1,5 +1,27 @@
 .score {
-    height:45px;
-    font-size: 1em;
-    border: 1px solid black;
+    height:32.5px;
+    border: 1px solid white;
+    padding: 5px 0 0 0;
+    text-align:center;
+    background-color: darkturquoise;
+}
+.score:active {
+    background-color: red;
+}
+.tabs {
+    height:32.5px;
+    padding: 5px 0 0 0;
+    text-align:center;
+    border-color: white;
+    border-style: solid;
+    border-radius: 5px 5px 0 0;
+    border-width: 1px 1px 1px 1px;
+    background-color: darkturquoise;
+}
+.active {
+    background-color: teal;
+}
+.container {
+    margin: 0 0 0 0;
+    width:100%;
 }
