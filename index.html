@@ -46,44 +46,48 @@
     <div class="container" ng-controller='myController'>
         <br><br><br>
         <div ng-repeat='frame in scoreData'>
-            <div class='col-xs-12 col-sm-3'>
+            <div class='col-xs-12 col-sm-2'>
                 <h3>Frame {{frame.framenum}}</h3>
-                <div class = 'col-xs-6'>
-                    <h4>Bowl 1: {{frame.bowl1}}</h4>
-                    <h4 ng-show = 'frame.bowl2tab'>Bowl 2: {{frame.bowl2}}</h4>
-                    <h4 ng-show = 'frame.bowl3tab'>Bowl 3: {{frame.bowl3}}</h4>
+                <div class = 'col-xs-12'>
                     <div class = 'row'>
                         <div class = 'col-xs-4 tabs' ng-class = '{active:frame.activetab === 1}' ng-click = 'selectTab(frame, 1)'>
-                            1
+                            {{frame.bowl1display}}
                         </div>
                         <div class = 'col-xs-4 tabs' ng-class = '{active:frame.activetab === 2}' ng-show = 'frame.bowl2tab' ng-click = 'selectTab(frame, 2)'>
-                            2
+                            {{frame.bowl2display}}
                         </div>
                         <div class = 'col-xs-4 tabs' ng-class = '{active:frame.activetab === 3}' ng-show = 'frame.bowl3tab' ng-click = 'selectTab(frame, 3)'>
-                            3
+                            {{frame.bowl3display}}
                         </div>
                     </div>
                     <div class = 'row' ng-show = 'frame.activetab === 1'>
-                        <div ng-repeat = 'calc in frame.bowl1Pad' class = 'col-xs-4 score' ng-click = 'frame.bowl1 = calcTranslator(calc); calcFrame(frame); frame.bowl2Pad = spareCalcMaker(frame)'>
+                        <div ng-repeat = 'calc in frame.bowl1Pad' class = 'col-xs-4 score' ng-click = 'frame.bowl1 = calcTranslator(frame, calc); frame.bowl2 = 0; frame.bowl3 = 0; frame.bowl3display = 0; calcFrame(frame); frame.bowl2Pad = spareCalcMaker(frame)'>
                             {{calc}}
                         </div>
                     </div>
                     <div class = 'row' ng-show = 'frame.activetab === 2'>
-                        <div ng-repeat = 'calc in frame.bowl2Pad track by $index' class = 'col-xs-4 score' ng-click = 'frame.bowl2 = calcTranslator(calc); calcFrame(frame); frame.bowl3Pad = spareCalcMaker(frame)'>
+                        <div ng-repeat = 'calc in frame.bowl2Pad track by $index' class = 'col-xs-4 score' ng-click = 'frame.bowl2 = calcTranslator(frame, calc);  frame.bowl3display = 0; frame.bowl3 = 0; calcFrame(frame); frame.bowl3Pad = spareCalcMaker(frame);'>
                             {{calc}}
                         </div>
                     </div>
                     <div class = 'row' ng-show = 'frame.activetab === 3'>
-                        <div ng-repeat = 'calc in frame.bowl3Pad' class = 'col-xs-4 score' ng-click = 'frame.bowl3 = calcTranslator(calc); calcFrame(frame)'>
+                        <div ng-repeat = 'calc in frame.bowl3Pad' class = 'col-xs-4 score' ng-click = 'frame.bowl3 = calcTranslator(frame, calc); calcFrame(frame); frame.bowl3display = calc'>
                             {{calc}}
                         </div>
                     </div>
-                </div>
-                <div class = 'col-xs-6'>
-                    <h6>Frame: {{frame.frametotal}}</h6>
-                    <h6>Agg Total: {{frame.aggtotal}}</h6>
-                    <h6>Spare: {{frame.sparebonus}}</h6>
-                    <h6>Strike: {{frame.strikebonus}}</h6>
+                    <div class = 'row'>
+                       <div class = 'scoreboard'>
+                            {{frame.aggtotal}}
+                        </div>
+                    </div>
+                    <div class = 'row'>
+                        <div class="col-xs-6 scoreboard">
+                            X : {{frame.strikebonus}}
+                        </div>
+                        <div class="col-xs-6 scoreboard">
+                            / : {{frame.sparebonus}}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

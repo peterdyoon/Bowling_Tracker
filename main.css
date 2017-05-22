@@ -3,12 +3,13 @@
     border: 1px solid white;
     padding: 5px 0 0 0;
     text-align:center;
-    background-color: darkturquoise;
+    background-color: #6C939F;
+    color:white;
 }
 .score:active {
     background-color: red;
 }
-.tabs {
+.tabs, .scoreboard {
     height:32.5px;
     padding: 5px 0 0 0;
     text-align:center;
@@ -16,10 +17,14 @@
     border-style: solid;
     border-radius: 5px 5px 0 0;
     border-width: 1px 1px 1px 1px;
-    background-color: darkturquoise;
+    background-color: #0F414F;
+    color:white;
+}
+.scoreboard {
+    border-radius: 0 0 5px 5px;
 }
 .active {
-    background-color: teal;
+    background-color: black;
 }
 .container {
     margin: 0 0 0 0;
