@@ -12,30 +12,128 @@ var database = firebase.database();
 var app = angular.module('MyApp', ['ngRoute']);
 
 app.controller('myController', function ($scope) {
-    database.ref().remove();
-    $scope.scoreData = [];
-    myData = $scope.scoreData;
-    for (var i = 0; i < 10; i++) {
-        myData.push({
-            bowl1: 0,
-            bowl1display:'',
-            strikebonus: 0,
-            sparebonus: 0,
-            bowl2: 0,
-            bowl2display:'',
-            bowl2tab: false,
-            bowl3: 0,
-            bowl3display:0,
-            activetab: 1,
-            bowl3tab: false,
-            frametotal: 0,
-            aggtotal: 0,
-            framenum: i + 1,
-            key: i, 
-            bowl1Pad: [1, 2, 3, 4, 5, 6, 7, 8, 9, 'X', 0,], 
-            bowl2Pad: [],
-            bowl3Pad: []
-        })
+    database.ref('/scores/').once('value').then(function(snapshot) {
+        $scope.allData = snapshot.val();
+    });
+    $scope.scoreData = {
+        Name: 'Peter Yoon',
+        Email: 'peteyoon14@gmail.com',
+        'PeterUserName': true,
+        bowl1average: 0,
+        bowl2average: 0,
+        strikes: 0,
+        strikebonusave: 0,
+        spares: 0,
+        sparebonusave: 0,
+        total: 0,
+        scores: []
+    };
+    myDataSet = $scope.scoreData;
+    myData = myDataSet.scores;
+    $scope.createNewRecord = function() {
+        for (var i = 0; i < 10; i++) {
+            myData.push({
+                bowl1: 0,
+                bowl1display: '',
+                strikebonus: 0,
+                sparebonus: 0,
+                bowl2: 0,
+                bowl2display: '',
+                bowl2tab: false,
+                bowl3: 0,
+                bowl3display: 0,
+                activetab: 1,
+                bowl3tab: false,
+                frametotal: 0,
+                aggtotal: 0,
+                framenum: i + 1,
+                key: i,
+                bowl1Pad: [1, 2, 3, 4, 5, 6, 7, 8, 9, 'X', 0, ],
+                bowl2Pad: [],
+                bowl3Pad: []
+            })
+        }
+        console.log(myData);
+        return false;
+    }
+    $scope.saveNewRecord = function() {
+        myDataSet.strikes = 0;
+        bowlstrikecount = 0;
+        myDataSet.strikebonusave = 0;
+        myDataSet.spares = 0;
+        bowlsparecount = 0;
+        myDataSet.sparebonusave = 0;
+        myDataSet.bowl1average = 0;
+        myDataSet.bowl2average = 0;
+        bowl1count = 0;
+        bowl2count = 0;
+        for (var i = 0; i < myData.length; i++) {
+            delete myData[i].$$hashKey;
+            
+//            Bowl1 and Bowl2 Average
+            myDataSet.bowl1average += myData[i].bowl1;
+            bowl1count++;
+            if (myData[i].bowl1 !== 10) {
+                myDataSet.bowl2average += myData[i].bowl2;
+                bowl2count++;
+            }
+            if (myData[i].key === 9) {
+                if (myData[i].bowl1 === 10 && myData[i].bowl2 === 10) {
+                    myDataSet.bowl1average += myData[i].bowl2 + myData[i].bowl3;
+                    bowl1count += 2;
+                } else if (myData[i].bowl1 === 10) {
+                    myDataSet.bowl1average += myData[i].bowl2;
+                    bowl1count++;
+                    myDataSet.bowl2average += myData[i].bowl3;
+                    bowl2count++;
+                } else if (myData[i].bowl1 + myData[i].bowl2 === 10) {
+                    myDataSet.bowl1average += myData[i].bowl3;
+                    bowl1count++;
+                    myDataSet.bowl2average += myData[i].bowl2;
+                    bowl2count++;
+                }
+            }
+//            Strike and Spare Count
+            if (myData[i].bowl1display === 'X') {
+                myDataSet.strikes ++;
+                bowlstrikecount ++;
+            }
+            if (myData[i].bowl2display === 'X') {
+                myDataSet.strikes ++;
+            } else if (myData[i].bowl2display === '/') {
+                myDataSet.spares ++;
+                bowlsparecount ++;
+            }
+            if (myData[i].bowl3display === 'X') {
+                myDataSet.strikes ++;
+            } else if (myData[i].bowl3display === '/') {
+                myDataSet.spares ++;
+            }
+//            Strike and Spare Average
+            myDataSet.strikebonusave += myData[i].strikebonus;
+            myDataSet.sparebonusave += myData[i].sparebonus;
+        }
+//        Bowl 1 and Bowl 2 Average
+        if (bowl2count === 0) {
+            bowl2count = 1;
+        }
+        myDataSet.bowl1average = (myDataSet.bowl1average / bowl1count).toFixed(2);
+        myDataSet.bowl2average = (myDataSet.bowl2average / bowl2count).toFixed(2);
+//        Strike and Spare Average
+        if (bowlstrikecount === 0) {
+            bowlstrikecount = 1;
+        }
+        if (bowlsparecount === 0) {
+            bowlsparecount = 1;
+        }
+        myDataSet.strikebonusave = (myDataSet.strikebonusave / bowlstrikecount).toFixed(2)
+        myDataSet.sparebonusave = (myDataSet.sparebonusave / bowlsparecount).toFixed(2);
+        
+        myDataSet.total = myData[9].aggtotal;
+        newkeyscores = database.ref().child('/scores/').push().key;
+        database.ref().child('/scores/' + newkey).set(myDataSet);
+        database.ref().child('/users/' + myDataSet.ID).set(newkey);
+        return false;
     }
     $scope.spareCalcMaker = function(frame) {
         var dumArray = [];
@@ -136,7 +234,7 @@ app.controller('myController', function ($scope) {
             if (myData[frame.key + 1].bowl1 === 10) {
                 myData[frame.key].strikebonus = 10 + myData[frame.key + 1].bowl2;
             } else {
-                myData[frame.key].strikebonus = myData[frame.key + 1].frametotal;
+                myData[frame.key].strikebonus = myData[frame.key + 1].bowl1 + myData[frame.key + 1].bowl2;
             }
         } else if (frame.key === 9) {
             if (myData[frame.key].bowl2 === 10) {
@@ -176,5 +274,4 @@ app.controller('myController', function ($scope) {
             frame.bowl3tab = false;
         }
     }
-    database.ref().child('/scores/0').set(myData);
 });

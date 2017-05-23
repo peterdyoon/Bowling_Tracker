@@ -45,7 +45,9 @@
 
     <div class="container" ng-controller='myController'>
         <br><br><br>
-        <div ng-repeat='frame in scoreData'>
+        <button class = 'btn btn-success' ng-click = 'createNewRecord()'>Create New Record</button>
+        <button class = 'btn btn-danger' ng-click = 'saveNewRecord()'>Save Record</button>
+        <div ng-repeat='frame in scoreData.scores'>
             <div class='col-xs-12 col-sm-2'>
                 <h3>Frame {{frame.framenum}}</h3>
                 <div class = 'col-xs-12'>
