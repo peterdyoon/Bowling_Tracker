@@ -9,54 +9,186 @@ var config = {
 firebase.initializeApp(config);
 var database = firebase.database();
 
-var app = angular.module('MyApp', ['ngRoute']);
+var app = angular.module('MyApp', ['firebase']);
 
-app.controller('myController', function ($scope) {
-    database.ref('/scores/').once('value').then(function(snapshot) {
-        $scope.allData = snapshot.val();
-    });
-    $scope.scoreData = {
-        Name: 'Peter Yoon',
-        Email: 'peteyoon14@gmail.com',
-        'PeterUserName': true,
-        bowl1average: 0,
-        bowl2average: 0,
-        strikes: 0,
-        strikebonusave: 0,
-        spares: 0,
-        sparebonusave: 0,
-        total: 0,
-        scores: []
-    };
-    myDataSet = $scope.scoreData;
-    myData = myDataSet.scores;
-    $scope.createNewRecord = function() {
-        for (var i = 0; i < 10; i++) {
-            myData.push({
-                bowl1: 0,
-                bowl1display: '',
-                strikebonus: 0,
-                sparebonus: 0,
-                bowl2: 0,
-                bowl2display: '',
-                bowl2tab: false,
-                bowl3: 0,
-                bowl3display: 0,
-                activetab: 1,
-                bowl3tab: false,
-                frametotal: 0,
-                aggtotal: 0,
-                framenum: i + 1,
-                key: i,
-                bowl1Pad: [1, 2, 3, 4, 5, 6, 7, 8, 9, 'X', 0, ],
-                bowl2Pad: [],
-                bowl3Pad: []
-            })
+function Profile(name, email){
+    this.Name = name;
+    this.Email = email;
+    this.bowl1average = 0;
+    this.bowl2average = 0;
+    this.strikes = 0;
+    this.strikebonusave = 0;
+    this.spares = 0;
+    this.sparebonusave = 0;
+    this.total = 0;
+    this.scores = [];
+    for (var i = 0; i < 10; i++) {
+        this.scores.push(new Scores(i));
+    }
+    this.refreshScores = function() {
+        for (var i = 0; i < this.scores.length; i++) {
+            
+            frame = this.scores[i]
+            
+            frame.frametotal = frame.bowl1 + frame.bowl2 + frame.bowl3;
+            
+            if (frame.bowl1 === 10) {
+                frame.bowl1display = 'X';
+                strikeCalculator(myData[i]);
+                myData[i].sparebonus = 0;
+            } else if (myData[i].bowl2 + myData[i].bowl1 === 10 && myData[i].bowl1 !== 10) {
+                myData[i].bowl2display = '/';
+                spareCalculator(myData[i]);
+                myData[i].strikebonus = 0;
+            } else {
+                myData[i].bowl1display = myData[i].bowl1;
+                myData[i].bowl2display = myData[i].bowl2;
+                myData[i].bowl3display = myData[i].bowl3;
+                myData[i].strikebonus = 0;
+                myData[i].sparebonus = 0;
+            }
+            
+            myData[i].aggtotal = 0;
+            if (i === 0) {
+                myData[i].aggtotal += myData[i].frametotal + myData[i].strikebonus + myData[i].sparebonus;
+            } else if (i === 9) {
+                if (myData[i].bowl1 === 10){
+                    myData[i].aggtotal += myData[i - 1].aggtotal + myData[i].bowl1 + myData[i].strikebonus + myData[i].sparebonus;
+                } else {
+                    myData[i].aggtotal += myData[i - 1].aggtotal + myData[i].bowl1 + myData[i].bowl2 + myData[i].strikebonus + myData[i].sparebonus;
+                }
+            } else {
+                myData[i].aggtotal += myData[i - 1].aggtotal + myData[i].frametotal + myData[i].strikebonus + myData[i].sparebonus;
+            }
         }
-        console.log(myData);
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        for (var i = 0; i < myData.length; i++) {
+            if (myData[i].bowl1 === 10) {
+                myData[i].bowl1display = 'X';
+                strikeCalculator(myData[i]);
+                myData[i].sparebonus = 0;
+            } else if (myData[i].bowl2 + myData[i].bowl1 === 10 && myData[i].bowl1 !== 10) {
+                myData[i].bowl2display = '/';
+                spareCalculator(myData[i]);
+                myData[i].strikebonus = 0;
+            } else {
+                myData[i].bowl1display = myData[i].bowl1;
+                myData[i].bowl2display = myData[i].bowl2;
+                myData[i].bowl3display = myData[i].bowl3;
+                myData[i].strikebonus = 0;
+                myData[i].sparebonus = 0;
+            }
+            
+            myData[i].aggtotal = 0;
+            if (i === 0) {
+                myData[i].aggtotal += myData[i].frametotal + myData[i].strikebonus + myData[i].sparebonus;
+            } else if (i === 9) {
+                if (myData[i].bowl1 === 10){
+                    myData[i].aggtotal += myData[i - 1].aggtotal + myData[i].bowl1 + myData[i].strikebonus + myData[i].sparebonus;
+                } else {
+                    myData[i].aggtotal += myData[i - 1].aggtotal + myData[i].bowl1 + myData[i].bowl2 + myData[i].strikebonus + myData[i].sparebonus;
+                }
+            } else {
+                myData[i].aggtotal += myData[i - 1].aggtotal + myData[i].frametotal + myData[i].strikebonus + myData[i].sparebonus;
+            }
+        }
+    }
+}
+
+function Scores(i) {
+    this.bowl1 = 0;
+    this.bowl2 = 0;
+    this.bowl3 = 0;
+    this.bowl1display = '';
+    this.bowl2display = '';
+    this.bowl2tab = false;
+    this.bowl3display = 0;
+    this.bowl3tab = false;
+    this.activetab = 1;
+    this.strikebonus = 0;
+    this.sparebonus = 0;
+    this.frametotal = 0;
+    this.aggtotal = 0;
+    this.framenum = i + 1;
+    this.key = i;
+    this.bowl1Pad = [1, 2, 3, 4, 5, 6, 7, 8, 9, 'X', 0, ];
+    this.bowl2Pad = [];
+    this.bowl3Pad = [];
+    this.bowl1scoreConversion = function(calc) {
+        if (calc === 'X') {
+            this.bowl1 = 10;
+        } else {
+            this.bowl1 = calc;
+        }
         return false;
     }
-    $scope.saveNewRecord = function() {
+    this.bowl2scoreConversion = function(calc) {
+        if (calc === '/') {
+            this.bowl2 = 10 - this.bowl1;
+        } else {
+            this.bowl2 = calc;
+        }
+        return false;
+    }
+    this.bowl3scoreConversion = function(calc) {
+        if (calc === 'X') {
+            this.bowl3 = 10;
+        } else if (calc === '/') {
+            this.bowl3 = 10 - this.bowl2;
+        } else {
+            this.bowl2 = calc;
+        }
+        return false;
+    }
+    this.resetbowl2and3 = function() {
+        this.bowl2 = 0;
+        this.bowl3 = 0;
+        this.bowl2display = 0;
+        this.bowl3display = 0;
+    }
+    this.resetbowl3 = function() {
+        this.bowl3 = 0;
+        this.bowl3display = 0;
+    }
+    this.activateTab = function() {
+        if (this.key === 9 && this.frametotal > 9){
+            this.bowl2tab = true;
+            this.bowl3tab = true;
+        } else if (frame.bowl1 === 10) {
+            this.bowl2tab = false;
+            this.bowl3tab = false;
+        } else {
+            this.bowl2tab = true;
+            this.bowl3tab = false;
+        }
+    }
+}
+
+app.controller('myController', ['$scope', '$firebaseArray', function ($scope, $firebaseArray) {
+    $scope.editrecord = {};
+    $scope.allData = $firebaseArray(database.ref('/scores/'));
+//    myDataSet = $scope.scoreData;
+//    myData = myDataSet.scores;
+    $scope.createNewRecord = function(newName, newEmail) {
+        $scope.scoreData = new Profile(newName, newEmail);
+        return false;
+    }
+    $scope.saveNewRecord = function(myDataSet, myData) {
+        if (myData[9].bowl2tab === false) {
+            alert("Your new record is incomplete. Please finish.");
+            return false;
+        }
         myDataSet.strikes = 0;
         bowlstrikecount = 0;
         myDataSet.strikebonusave = 0;
@@ -130,9 +262,7 @@ app.controller('myController', function ($scope) {
         myDataSet.sparebonusave = (myDataSet.sparebonusave / bowlsparecount).toFixed(2);
         
         myDataSet.total = myData[9].aggtotal;
-        newkeyscores = database.ref().child('/scores/').push().key;
-        database.ref().child('/scores/' + newkey).set(myDataSet);
-        database.ref().child('/users/' + myDataSet.ID).set(newkey);
+        $scope.allData.$add(myDataSet);
         return false;
     }
     $scope.spareCalcMaker = function(frame) {
@@ -274,4 +404,4 @@ app.controller('myController', function ($scope) {
             frame.bowl3tab = false;
         }
     }
-});
+}]);
