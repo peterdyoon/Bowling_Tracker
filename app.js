@@ -25,17 +25,44 @@ function Profile(name, email){
     for (var i = 0; i < 10; i++) {
         this.scores.push(new Scores(i));
     }
+    this.strikeCalculator = function(key) {
+        this.scores[key].bowl1display = 'X';
+        this.scores[key].strikebonus = 0;
+        this.scores[key].sparebonus = 0;
+        if (key === 8) {
+            if (this.scores[key + 1].bowl1 === 10) {
+                this.scores[key].strikebonus = 10 + this.scores[key + 1].bowl2;
+            } else {
+                this.scores[key].strikebonus = this.scores[key + 1].bowl1 + this.scores[key + 1].bowl2;
+            }
+        } else if (key === 9) {
+            if (this.scores[key].bowl2 === 10) {
+                this.scores[key].bowl2display = 'X';
+                this.scores[key].strikebonus = 10 + this.scores[key].bowl3;
+            } else {
+                this.scores[key].strikebonus = this.scores[key].bowl2 + this.scores[key].bowl3;
+            }
+            if (this.scores[key].bowl3 === 10) {
+                this.scores[key].bowl3display = 'X';
+            }
+        } else {
+            if (this.scores[key + 1].bowl1 === 10) {
+                this.scores[key].strikebonus = 10 + this.scores[key + 2].bowl1;
+            } else {
+                this.scores[key].strikebonus = this.scores[key + 1].frametotal;
+            }
+        }
+    }
     this.refreshScores = function() {
         for (var i = 0; i < this.scores.length; i++) {
+            //strike calculator, spare calculator, non-strike/spare calculator, agg-total calculator
             
             frame = this.scores[i]
             
             frame.frametotal = frame.bowl1 + frame.bowl2 + frame.bowl3;
             
             if (frame.bowl1 === 10) {
-                frame.bowl1display = 'X';
-                strikeCalculator(myData[i]);
-                myData[i].sparebonus = 0;
+                strikeCalculator(frame.key);
             } else if (myData[i].bowl2 + myData[i].bowl1 === 10 && myData[i].bowl1 !== 10) {
                 myData[i].bowl2display = '/';
                 spareCalculator(myData[i]);
