@@ -1,0 +1,60 @@
+<div ng-controller='myController'>
+<div class='col-xs-3'>
+    <button class='btn btn-success' ng-click='createNewRecord(newName, newEmail)'>Create New Record</button>
+    <button class='btn btn-danger' ng-click='saveNewRecord(scoreData, scoreData.scores)'>Save Record</button>
+    <div class="form-group">
+        <label>Name</label>
+        <input type="text" class="form-control" placeholder="Name" ng-model='newName'>
+    </div>
+    <div class="form-group">
+        <label>Email address</label>
+        <input type="email" class="form-control" placeholder="Email" ng-model='newEmail'>
+    </div>
+</div>
+<div ng-repeat='frame in scoreData.scores'>
+    <div class='col-xs-12 col-sm-2'>
+        <h3>Frame {{frame.framenum}}</h3>
+        <div class='col-xs-12'>
+            <div class='row'>
+                <div class='col-xs-4 tabs' ng-class='{active:frame.activetab === 1}' ng-click='frame.selectTab(1)'>
+                    {{frame.bowl1display}}
+                </div>
+                <div class='col-xs-4 tabs' ng-class='{active:frame.activetab === 2}' ng-show='frame.bowl2tab' ng-click='frame.selectTab(2)'>
+                    {{frame.bowl2display}}
+                </div>
+                <div class='col-xs-4 tabs' ng-class='{active:frame.activetab === 3}' ng-show='frame.bowl3tab' ng-click='frame.selectTab(3)'>
+                    {{frame.bowl3display}}
+                </div>
+            </div>
+            <div class='row' ng-show='frame.activetab === 1'>
+                <div ng-repeat='calc in frame.bowl1Pad' class='col-xs-4 score' ng-click='frame.bowl1scoreConversion(calc); scoreData.refreshScores(); frame.bowl2NumPadMaker(); frame.activateTab()'>
+                    {{calc}}
+                </div>
+            </div>
+            <div class='row' ng-show='frame.activetab === 2'>
+                <div ng-repeat='calc in frame.bowl2Pad track by $index' class='col-xs-4 score' ng-click='frame.bowl2scoreConversion(calc); scoreData.refreshScores(); frame.bowl3NumPadMaker(); frame.activateTab();'>
+                    {{calc}}
+                </div>
+            </div>
+            <div class='row' ng-show='frame.activetab === 3'>
+                <div ng-repeat='calc in frame.bowl3Pad' class='col-xs-4 score' ng-click='frame.bowl3scoreConversion(calc); scoreData.refreshScores();'>
+                    {{calc}}
+                </div>
+            </div>
+            <div class='row'>
+                <div class='scoreboard'>
+                    {{frame.aggtotal}}
+                </div>
+            </div>
+            <div class='row'>
+                <div class="col-xs-6 scoreboard">
+                    X : {{frame.strikebonus}}
+                </div>
+                <div class="col-xs-6 scoreboard">
+                    / : {{frame.sparebonus}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>

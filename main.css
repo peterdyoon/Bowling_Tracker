@@ -9,6 +9,9 @@
 .score:active {
     background-color: red;
 }
+th, td {
+    text-align:center;
+}
 .tabs, .scoreboard {
     height:32.5px;
     padding: 5px 0 0 0;
@@ -29,4 +32,7 @@
 .container {
     margin: 0 0 0 0;
     width:100%;
+}
+table {
+    table-layout: fixed;
 }
