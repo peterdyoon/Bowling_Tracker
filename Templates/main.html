@@ -1,0 +1,23 @@
+<div ng-controller="MyAuthCtrl">
+    <div ng-show="firebaseUser">
+        <p>Hello, {{ firebaseUser.displayName }}</p>
+        <button class = 'btn btn-danger'ng-click="auth.$signOut()">Sign Out</button>
+    </div>
+    <div ng-hide="firebaseUser">
+        <p>Please sign in!</p>
+        Email: <input type="email" ng-model="email"> Password: <input type="password" ng-model="password">
+
+        <br><br>
+
+        <button ng-click="createUser()">Create User</button>
+
+        <br><br>
+
+        <button ng-click="deleteUser()">Delete User</button>
+        
+        <button ng-click="auth.$signInWithPopup('google')">Sign In With Facebook</button>
+
+        <p ng-if="message">Message: <strong>{{ message }}</strong></p>
+        <p ng-if="error">Error: <strong>{{ error }}</strong></p>
+    </div>
+</div>
