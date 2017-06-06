@@ -70,6 +70,7 @@
                 <th>8</th>
                 <th>9</th>
                 <th>10</th>
+                <th>Total</th>
             </tr>
             <tr ng-repeat='record in userData'>
                 <td>{{record.Name}}</td>
@@ -81,6 +82,7 @@
                     <span ng-show='scores.bowl3tab'>{{scores.bowl3display}}</span>
                     <div class='col-xs-12'>{{scores.aggtotal}}</div>
                 </td>
+                <td>{{record.scores[9].aggtotal}}</td>
             </tr>
         </table>
     </div>
