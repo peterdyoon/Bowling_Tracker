@@ -1,5 +1,5 @@
 <div ng-controller="MyAuthCtrl">
-    <div ng-show="firebaseUser" class = 'col-xs-4'>
+    <div ng-show="firebaseUser" class = 'col-xs-12 col-sm-4'>
         <h1>User Profile</h1>
         <form>
            <div class="form-group">
@@ -20,7 +20,7 @@
         <button class = 'btn btn-danger'ng-click="auth.$signOut()">Sign Out</button>
     </div>
     <div ng-hide="firebaseUser">
-       <div ng-hide = 'newAccount' class = "col-xs-4">
+       <div ng-hide = 'newAccount' class = "col-xs-12 col-sm-4">
             <h1>Login Page</h1>
             <div class="form-group">
                 <label for="email">Email address</label>
@@ -41,7 +41,7 @@
             <p>New to BowlingTracker? Create your own account!</p>
             <button ng-click = 'newAccount = true' class = "btn btn-success">Create Account</button>
         </div>
-        <div ng-show = 'newAccount' class = "col-xs-4">
+        <div ng-show = 'newAccount' class = "col-xs-12 col-sm-4">
            <h1>New Bowler Registration</h1>
            <div class="form-group">
                 <label for="name">Full Name</label>

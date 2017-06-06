@@ -1,8 +1,6 @@
 <div class='col-xs-12'>
-   <div class = 'col-xs-3'>
-        <button class='btn btn-success' ng-click='createNewRecord($scope.currentUser.displayName, $scope.currentUser.email)'>Create New Record</button>
-        <button class='btn btn-danger' ng-click='saveEditedRecord(scoreData);'>Save Record</button>
-    </div>
+    <button class='btn btn-success' ng-click='createNewRecord($scope.currentUser.displayName, $scope.currentUser.email)'>Create New Record</button>
+    <button class='btn btn-danger' ng-click='saveEditedRecord(scoreData);'>Save Record</button>
 </div>
 <div ng-repeat='frame in scoreData.scores'>
     <div class='col-xs-12 col-sm-2'>
