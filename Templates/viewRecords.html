@@ -1,6 +1,14 @@
 <div class='row'>
     <div class='col-xs-12'>
        <h1>All Records</h1>
+       <div class="form-group col-xs-12 col-sm-3">
+            <label for="filter">Find Bowler:</label>
+            <input type="text" class="form-control" placeholder="Input Name" ng-model="myfilter">
+        </div>
+        <div class="form-group col-xs-12 col-sm-3">
+            <label for="filter">Min Score:</label>
+            <input type="text" class="form-control" placeholder="Input Name" ng-model="myscorefilter">
+        </div>
         <table class='table table-responsive table-striped table-condensed table-bordered'>
             <tr>
                 <th>Name</th>
@@ -16,7 +24,7 @@
                 <th>10</th>
                 <th>Total</th>
             </tr>
-            <tr ng-repeat='record in allData | filter:{ gameFinished: "Complete"}'>
+            <tr ng-repeat='record in allData | filter:{ gameFinished: "Complete"} | filter:{ Name : myfilter} | filter:{ total : myfilter}'>
                 <td>{{record.Name}}</td>
                 <td ng-repeat='scores in record.scores' ng-click='selectRecord(record, scores)'>
                     <span ng-show='!scores.bowl3tab'></span>
