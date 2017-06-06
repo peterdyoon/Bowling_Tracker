@@ -1,0 +1,177 @@
+<div class = 'row'>
+    <div class = 'col-xs-12'>
+        <h1>Overall Statistics</h1>
+    </div>
+    <div class = 'col-xs-2'>
+        <table class='table table-striped table-condensed table-bordered'>
+           <tr>
+               <th>Description</th>
+               <th>Score</th>
+           </tr>
+           <tr>
+               <th>Strikes</th>
+               <th>{{userDataProfile.strikes}}</th>
+           </tr>
+           <tr>
+               <th>Spares</th>
+               <th>{{userDataProfile.spares}}</th>
+           </tr>
+           <tr>
+               <th>Total Pins</th>
+               <th>{{userDataProfile.total}}</th>
+           </tr>
+<!--
+            <tr>
+                <td>Total Score</td>
+                <td>{{editRecord.total}}</td>
+            </tr>
+            <tr>
+                <td>1st Bowl Ave</td>
+                <td>{{editRecord.bowl1average}}</td>
+            </tr>
+            <tr>
+                <td>2nd Bowl Ave</td>
+                <td>{{editRecord.bowl2average}}</td>
+            </tr>
+            <tr>
+                <td>Strikes</td>
+                <td>{{editRecord.strikes}}</td>
+            </tr>
+            <tr>
+                <td>Spares</td>
+                <td>{{editRecord.spares}}</td>
+            </tr>
+            <tr>
+                <td>Strike Bonus Ave</td>
+                <td>{{editRecord.strikebonusave}}</td>
+            </tr>
+            <tr>
+                <td>Spare Bonus Ave</td>
+                <td>{{editRecord.sparebonusave}}</td>
+            </tr>
+-->
+       </table>
+    </div>
+</div>
+<div class='row'>
+    <div class='col-xs-12'>
+       <h1>User Records</h1>
+        <table class='fixedlayout table table-striped table-condensed table-bordered'>
+            <tr>
+                <th>Name</th>
+                <th>Complete</th>
+                <th>1</th>
+                <th>2</th>
+                <th>3</th>
+                <th>4</th>
+                <th>5</th>
+                <th>6</th>
+                <th>7</th>
+                <th>8</th>
+                <th>9</th>
+                <th>10</th>
+            </tr>
+            <tr ng-repeat='record in userData'>
+                <td>{{record.Name}}</td>
+                <td>{{record.gameFinished}}</td>
+                <td ng-repeat='scores in record.scores' ng-click='selectRecord(record, scores)'>
+                    <span ng-show='!scores.bowl3tab'></span>
+                    <span>{{scores.bowl1display}} </span>
+                    <span ng-show='scores.bowl2tab'>{{scores.bowl2display}}</span>
+                    <span ng-show='scores.bowl3tab'>{{scores.bowl3display}}</span>
+                    <div class='col-xs-12'>{{scores.aggtotal}}</div>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+<!--        Calculator Popup-->
+<div ng-show = 'recordSelected'>
+<div class = 'col-xs-2'>
+  <h3>Statistics</h3>
+   <table class='table table-striped table-condensed table-bordered'>
+       <tr>
+           <th>Description</th>
+           <th>Score</th>
+       </tr>
+        <tr>
+            <td>Total Score</td>
+            <td>{{editRecord.total}}</td>
+        </tr>
+        <tr>
+            <td>1st Bowl Ave</td>
+            <td>{{editRecord.bowl1average}}</td>
+        </tr>
+        <tr>
+            <td>2nd Bowl Ave</td>
+            <td>{{editRecord.bowl2average}}</td>
+        </tr>
+        <tr>
+            <td>Strikes</td>
+            <td>{{editRecord.strikes}}</td>
+        </tr>
+        <tr>
+            <td>Spares</td>
+            <td>{{editRecord.spares}}</td>
+        </tr>
+        <tr>
+            <td>Strike Bonus Ave</td>
+            <td>{{editRecord.strikebonusave}}</td>
+        </tr>
+        <tr>
+            <td>Spare Bonus Ave</td>
+            <td>{{editRecord.sparebonusave}}</td>
+        </tr>
+   </table>
+</div>
+<div class='col-xs-12 col-sm-2'>
+    <h3>Frame {{frame.framenum}}</h3>
+    <div class='col-xs-12'>
+        <div class='row'>
+            <div class='col-xs-4 tabs' ng-class='{active:frame.activetab === 1}' ng-click='frame.selectTab(1)'>
+                {{frame.bowl1display}}
+            </div>
+            <div class='col-xs-4 tabs' ng-class='{active:frame.activetab === 2}' ng-show='frame.bowl2tab' ng-click='frame.selectTab(2)'>
+                {{frame.bowl2display}}
+            </div>
+            <div class='col-xs-4 tabs' ng-class='{active:frame.activetab === 3}' ng-show='frame.bowl3tab' ng-click='frame.selectTab(3)'>
+                {{frame.bowl3display}}
+            </div>
+        </div>
+        <div class='row' ng-show='frame.activetab === 1'>
+            <div ng-repeat='calc in frame.bowl1Pad' class='col-xs-4 score' ng-click='frame.bowl1scoreConversion(calc); editRecord.refreshScores(); frame.bowl2NumPadMaker(); frame.activateTab();'>
+                {{calc}}
+            </div>
+        </div>
+        <div class='row' ng-show='frame.activetab === 2'>
+            <div ng-repeat='calc in frame.bowl2Pad track by $index' class='col-xs-4 score' ng-click='frame.bowl2scoreConversion(calc); editRecord.refreshScores(); frame.bowl3NumPadMaker(); frame.activateTab();'>
+                {{calc}}
+            </div>
+        </div>
+        <div class='row' ng-show='frame.activetab === 3'>
+            <div ng-repeat='calc in frame.bowl3Pad' class='col-xs-4 score' ng-click='frame.bowl3scoreConversion(calc); editRecord.refreshScores();'>
+                {{calc}}
+            </div>
+        </div>
+        <div class='row'>
+            <div class='scoreboard'>
+                {{frame.aggtotal}}
+            </div>
+        </div>
+        <div class='row'>
+            <div class="col-xs-6 scoreboard">
+                X : {{frame.strikebonus}}
+            </div>
+            <div class="col-xs-6 scoreboard">
+                / : {{frame.sparebonus}}
+            </div>
+        </div>
+    </div>
+</div>
+<div class = 'col-xs-2'>
+   <h3>Edit</h3>
+    <button class = 'btn btn-success' ng-click = 'saveEditedRecord(editRecord); recordSelected = false;'>Save Changes</button>
+   <br><br>
+   <button class = 'btn btn-danger' ng-click = 'recordSelected = false;'>Cancel</button>
+</div>
+</div>

@@ -1,0 +1,61 @@
+<div ng-controller="MyAuthCtrl">
+    <div ng-show="firebaseUser" class = 'col-xs-4'>
+        <h1>User Profile</h1>
+        <form>
+           <div class="form-group">
+               <label for="name">Full Name: </label>
+                <input type="text" class="form-control" id="name" placeholder="Edit Name" ng-model="name">
+                <br>
+                <p ng-show = 'nameChange' class = "profileupdates">Name changed to {{name}}!</p>
+                <button class = 'btn btn-info'ng-click="updateName()">Update Name</button>
+            </div>
+            <div class="form-group">
+                <label for="email">Email address</label>
+                <input type="email" class="form-control" id="email" placeholder="Email" ng-model="email">
+                <br>
+                <p ng-show = 'emailChange' class = "profileupdates">Email changed to {{email}}!</p>
+                <button class = 'btn btn-info'ng-click="updateEmail()">Update Email</button>
+            </div>
+        </form>
+        <button class = 'btn btn-danger'ng-click="auth.$signOut()">Sign Out</button>
+    </div>
+    <div ng-hide="firebaseUser">
+       <div ng-hide = 'newAccount' class = "col-xs-4">
+            <h1>Login Page</h1>
+            <div class="form-group">
+                <label for="email">Email address</label>
+                <input type="email" class="form-control" id="email" placeholder="Email" ng-model="email">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" id="password" placeholder="Password" ng-model="password">
+            </div>
+            <button type="submit" class="btn btn-default">Sign In</button>
+            <br><br>
+            <button ng-click="signinGoogle()" class = "btn btn-primary">Sign In With Google</button>
+            <p ng-if="error">Error: <strong>{{ error }}</strong></p>
+            <br><br>
+            <button ng-click="guestsignin()" class = "btn btn-primary">Sign In As Guest</button>
+            <p ng-if="error">Error: <strong>{{ error }}</strong></p>
+            <br><br>
+            <p>New to BowlingTracker? Create your own account!</p>
+            <button ng-click = 'newAccount = true' class = "btn btn-success">Create Account</button>
+        </div>
+        <div ng-show = 'newAccount' class = "col-xs-4">
+           <h1>New Bowler Registration</h1>
+           <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" class="form-control" id="name" placeholder="Full Name" ng-model="name">
+            </div>
+            <div class="form-group">
+                <label for="email">Email address</label>
+                <input type="email" class="form-control" id="email" placeholder="Email" ng-model="email">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" id="password" placeholder="Password" ng-model="password">
+            </div>
+            <button ng-click = "createUser();" type="submit" class="btn btn-default">Create User</button>
+        </div>
+    </div>
+</div>
