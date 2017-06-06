@@ -14,15 +14,43 @@ var app = angular.module('MyApp', ['firebase', 'ngRoute']);
 app.config(['$routeProvider', '$locationProvider', function
     ($routeProvider, $locationProvider) {
         $routeProvider.when("/pageMain", {
-            templateUrl: "Templates/main.html"
+            controller: "myController",
+            templateUrl: "Templates/main.html",
+            resolve: {
+                "currentAuth": ["Auth", function(Auth) {
+                    return Auth.$requireSignIn();
+                }]
+            }
         }).when("/createnew", {
-            templateUrl: "Templates/scoreCalculator.html"
+            controller: "myController",
+            templateUrl: "Templates/scoreCalculator.html",
+            resolve: {
+                "currentAuth": ["Auth", function(Auth) {
+                    return Auth.$requireSignIn();
+                }]
+            }
         }).when("/viewrecords", {
-            templateUrl: "Templates/viewRecords.html"
+            controller: "myController",
+            templateUrl: "Templates/viewRecords.html", 
+            resolve: {
+                "currentAuth": ["Auth", function(Auth) {
+                    return Auth.$requireSignIn();
+                }]
+            }
+        }).when("/signin", {
+            templateUrl: "Templates/profile.html",
+        }).when("/editrecord", {
+            controller: "myController",
+            templateUrl: "Templates/editRecords.html", 
+            resolve: {
+                "currentAuth": ["Auth", function(Auth) {
+                    return Auth.$requireSignIn();
+                }]
+            }
         })
 }]);
 
-app.controller('myNavController', ['$scope', function ($scope) {
+app.controller("myNavController", ['$scope', function ($scope) {
     $scope.tab = 0;
     $scope.selectTab = function (newTab) {
         $scope.tab = newTab;
@@ -35,20 +63,45 @@ app.factory("Auth", ["$firebaseAuth",
   }
 ]);
 
-app.controller("MyAuthCtrl", ["$scope", "Auth", function ($scope, Auth) {
+app.controller("MyAuthCtrl", ["$scope", "Auth", "$firebaseArray", function ($scope, Auth, $firebaseArray) {
     $scope.auth = Auth;
+    $scope.newAccount = false;
+    $scope.user = null;
+    $scope.nameChange = false;
+    $scope.emailChange = false;
+    $scope.tempBugSolution = true;
     $scope.createUser = function() {
       $scope.message = null;
       $scope.error = null;
-
-      // Create a new user
-      $scope.auth.$createUserWithEmailAndPassword($scope.email, $scope.password)
+        $scope.auth.$createUserWithEmailAndPassword($scope.email, $scope.password)
         .then(function(firebaseUser) {
-          $scope.message = "User created with uid: " + firebaseUser.uid;
+            $firebaseArray(database.ref('/users/')).$add(firebaseUser);
         }).catch(function(error) {
           $scope.error = error;
         });
     };
+    $scope.updateName = function() {
+        $scope.user.updateProfile({
+          displayName: $scope.name,
+        }).then(function() {
+          // Update successful.
+        }, function(error) {
+          // An error happened.
+        });
+        $scope.nameChange = true;
+        return false;
+    }
+    $scope.updateEmail = function() {
+        $scope.user.updateEmail($scope.email).then(function() {
+        // Update successful.
+        }, function(error) {
+        // An error happened.
+            console.log(error);
+        });
+        $scope.emailChange = true;
+        $scope.tempBugSolution = false;
+        return false;
+    }
     $scope.deleteUser = function() {
       $scope.message = null;
       $scope.error = null;
@@ -62,52 +115,64 @@ app.controller("MyAuthCtrl", ["$scope", "Auth", function ($scope, Auth) {
     };
     $scope.auth.$onAuthStateChanged(function(firebaseUser) {
       $scope.firebaseUser = firebaseUser;
+        $scope.newAccount = false;
+        $scope.name = firebaseUser.displayName;
+        if ($scope.tempBugSolution) {
+            $scope.email = firebaseUser.email;
+        }
+        $scope.user = firebase.auth().currentUser;
     });
+    //Guest Sign In
+   $scope.guestsignin = function() {
+        $scope.auth.$signInAnonymously().then(function(firebaseUser) {
+        console.log("Signed in as:", firebaseUser.uid);
+        }).catch(function(error) {
+        console.error("Authentication failed:", error);
+        });
+   } 
     
     //Google Sign in
-    $scope.provider = new firebase.auth.GoogleAuthProvider();
-    firebase.auth().signInWithPopup($scope.provider).then(function (result) {
-        var token = result.credential.accessToken;
-        var user = result.user;
-        console.log(token, user + ' : it worked!');
-    }).catch(function (error) {
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        var email = error.email;
-        var credential = error.credential;
-        console.log(errorMessage + ' ' + email + ' ' + credential);
-    });
-//    $scope.auth.$signInWithPopup("google").then(function (result) {
-//        // This gives you a Google Access Token. You can use it to access the Google API.
-//        var token = result.credential.accessToken;
-//        // The signed-in user info.
-//        var user = result.user;
-//        // ...
-//    }).catch(function (error) {
-//        // Handle Errors here.
-//        var errorCode = error.code;
-//        var errorMessage = error.message;
-//        // The email of the user's account used.
-//        var email = error.email;
-//        // The firebase.auth.AuthCredential type that was used.
-//        var credential = error.credential;
-//        // ...
-//    });
+    $scope.signinGoogle = function() {
+        $scope.auth.$signInWithPopup("google").then(function (result) {
+            console.log("Signed in as:", result.user.uid);
+        }).catch(function (error) {
+            console.error("Authentication failed:", error);
+        });
+    }
 }]);
 
-app.controller('myController', ['$scope', '$firebaseArray', function ($scope, $firebaseArray) {
+app.controller('myController', ['$scope', '$firebaseArray', "currentAuth", function ($scope, $firebaseArray, currentAuth) {
+    $scope.currentUser = currentAuth;
     $scope.editRecord = {};
     $scope.frame = {};
+    $scope.scoreData = {};
     $scope.selectRecord = function (record, scores) {
         $scope.editRecord = record;
         $scope.frame = scores;
+        $scope.recordSelected = true;
     }
     $scope.allData = $firebaseArray(database.ref('/scores/'));
-    $scope.allData.$loaded().then(function (x) {
+    $scope.allDataUsers = $firebaseArray(database.ref('/users/'));
+    $scope.userData = [];
+    $scope.userDataProfile = null;
+    $scope.allData.$loaded().then(function (result) {
         for (var i = 0; i < $scope.allData.length; i++) {
             $scope.allData[i].__proto__ = Profile.prototype;
+            if ($scope.currentUser.email === $scope.allData[i].Email) {
+                    $scope.userData.push($scope.allData[i]);
+                }
             for (var j = 0; j < 10; j++) {
                 $scope.allData[i].scores[j].__proto__ = Scores.prototype;
+            }
+        }
+    }).catch(function (error) {
+        console.log("Error:", error);
+    });
+    $scope.allDataUsers.$loaded().then(function (result) {
+        for (var i = 0; i < result.length; i ++) {
+            if ($scope.currentUser.email === result[i].email) {
+                console.log('Hit!' + result[i]);
+                $scope.userDataProfile = result[i];
             }
         }
     }).catch(function (error) {
@@ -117,87 +182,38 @@ app.controller('myController', ['$scope', '$firebaseArray', function ($scope, $f
     $scope.createNewRecord = function (newName, newEmail) {
         $scope.scoreData = new Profile(newName, newEmail);
         $scope.scoreData.createScores();
+        $scope.scoreData.Name = $scope.currentUser.displayName;
+        $scope.scoreData.Email = $scope.currentUser.email;
+        $scope.scoreData.checkFinishedGame();
+        $scope.allData.$add($scope.scoreData).then(function(ref) {
+            var index = $scope.allData.$indexFor(ref.key);
+            $scope.scoreData = $scope.allData[index];
+            $scope.scoreData.__proto__ = Profile.prototype;
+            for (var i = 0; i < 10; i++) {
+                $scope.scoreData.scores[i].__proto__ = Scores.prototype;
+            }
+            console.log($scope.scoreData);
+        });
         return false;
     }
-    $scope.saveNewRecord = function (myDataSet, myData) {
-        if (myData[9].bowl2tab === false) {
-            alert("Your new record is incomplete. Please finish.");
-            return false;
-        }
-        myDataSet.strikes = 0;
-        bowlstrikecount = 0;
-        myDataSet.strikebonusave = 0;
-        myDataSet.spares = 0;
-        bowlsparecount = 0;
-        myDataSet.sparebonusave = 0;
-        myDataSet.bowl1average = 0;
-        myDataSet.bowl2average = 0;
-        bowl1count = 0;
-        bowl2count = 0;
-        for (var i = 0; i < myData.length; i++) {
-            delete myData[i].$$hashKey;
-
-            //            Bowl1 and Bowl2 Average
-            myDataSet.bowl1average += myData[i].bowl1;
-            bowl1count++;
-            if (myData[i].bowl1 !== 10) {
-                myDataSet.bowl2average += myData[i].bowl2;
-                bowl2count++;
+    $scope.saveEditedRecord = function (record) {
+        record.resetProfile();
+        record.bowlAverage();
+        record.strikespareCount();
+        record.checkFinishedGame();
+        if ($scope.userDataProfile !== null) {
+            for (var i = 0; i < $scope.userData.length; i++) {
+                $scope.userDataProfile.strikes += record.strikes;
+                $scope.userDataProfile.spares += record.spares;
+                $scope.userDataProfile.total += record.total;
             }
-            if (myData[i].key === 9) {
-                if (myData[i].bowl1 === 10 && myData[i].bowl2 === 10) {
-                    myDataSet.bowl1average += myData[i].bowl2 + myData[i].bowl3;
-                    bowl1count += 2;
-                } else if (myData[i].bowl1 === 10) {
-                    myDataSet.bowl1average += myData[i].bowl2;
-                    bowl1count++;
-                    myDataSet.bowl2average += myData[i].bowl3;
-                    bowl2count++;
-                } else if (myData[i].bowl1 + myData[i].bowl2 === 10) {
-                    myDataSet.bowl1average += myData[i].bowl3;
-                    bowl1count++;
-                    myDataSet.bowl2average += myData[i].bowl2;
-                    bowl2count++;
-                }
-            }
-            //            Strike and Spare Count
-            if (myData[i].bowl1display === 'X') {
-                myDataSet.strikes++;
-                bowlstrikecount++;
-            }
-            if (myData[i].bowl2display === 'X') {
-                myDataSet.strikes++;
-            } else if (myData[i].bowl2display === '/') {
-                myDataSet.spares++;
-                bowlsparecount++;
-            }
-            if (myData[i].bowl3display === 'X') {
-                myDataSet.strikes++;
-            } else if (myData[i].bowl3display === '/') {
-                myDataSet.spares++;
-            }
-            //            Strike and Spare Average
-            myDataSet.strikebonusave += myData[i].strikebonus;
-            myDataSet.sparebonusave += myData[i].sparebonus;
         }
-        //        Bowl 1 and Bowl 2 Average
-        if (bowl2count === 0) {
-            bowl2count = 1;
-        }
-        myDataSet.bowl1average = (myDataSet.bowl1average / bowl1count).toFixed(2);
-        myDataSet.bowl2average = (myDataSet.bowl2average / bowl2count).toFixed(2);
-        //        Strike and Spare Average
-        if (bowlstrikecount === 0) {
-            bowlstrikecount = 1;
-        }
-        if (bowlsparecount === 0) {
-            bowlsparecount = 1;
-        }
-        myDataSet.strikebonusave = (myDataSet.strikebonusave / bowlstrikecount).toFixed(2)
-        myDataSet.sparebonusave = (myDataSet.sparebonusave / bowlsparecount).toFixed(2);
-
-        myDataSet.total = myData[9].aggtotal;
-        $scope.allData.$add(myDataSet);
+        $scope.allData.$save(record).then(function(ref) {
+            for (var j = 0; j < 10; j++) {
+                record.scores[j].__proto__ = Scores.prototype;
+            }
+        });
+        $scope.allDataUsers.$save($scope.userDataProfile);
         return false;
     }
 }]);
@@ -212,7 +228,102 @@ function Profile(name, email) {
     this.spares = 0;
     this.sparebonusave = 0;
     this.total = 0;
+    this.bowlstrikecount = 0;
+    this.bowlsparecount = 0;
+    this.bowl1count = 0;
+    this.bowl2count = 0;
+    this.gameFinished = false;
     this.scores = [];
+}
+Profile.prototype.checkFinishedGame = function() {
+    for (var i = 0; i < this.scores.length; i++) {
+        if (this.scores[i].bowl1display === "") {
+            this.gameFinished = 'Unfinished';
+            return false;
+        } else if (this.scores[i].bowl2tab && this.scores[i].bowl2display === "") {
+            this.gameFinished = 'Unfinished';
+            return false;
+        } else if (this.scores[i].bowl3tab && this.scores[i].bowl3display === "") {
+            this.gameFinished = 'Unfinished';
+            return false;
+        } else {
+            this.gameFinished = 'Complete';
+        }
+    }
+    console.log(this.scores[0]);
+    return false;
+}
+Profile.prototype.resetProfile = function() {
+    this.strikes = 0;
+    this.strikebonusave = 0;
+    this.spares = 0;
+    this.sparebonusave = 0;
+    this.bowl1average = 0;
+    this.bowl2average = 0;
+    this.bowlstrikecount = 0;
+    this.bowlsparecount = 0;
+    this.bowl1count = 0;
+    this.bowl2count = 0;
+}
+Profile.prototype.bowlAverage = function() {
+    for (var i = 0; i < this.scores.length; i++) {
+        delete this.scores[i].$$hashKey;
+        this.bowl1average += this.scores[i].bowl1;
+        this.bowl1count++;
+        if (this.scores[i].bowl1 !== 10) {
+            this.bowl2average += this.scores[i].bowl2;
+            this.bowl2count++;
+        }
+        if (this.scores[i].key === 9) {
+            if (this.scores[i].bowl1 === 10 && this.scores[i].bowl2 === 10) {
+                this.bowl1average += this.scores[i].bowl2 + this.scores[i].bowl3;
+                this.bowl1count += 2;
+            } else if (this.scores[i].bowl1 === 10) {
+                this.bowl1average += this.scores[i].bowl2;
+                this.bowl1count++;
+                this.bowl2average += this.scores[i].bowl3;
+                this.bowl2count++;
+            } else if (this.scores[i].bowl1 + this.scores[i].bowl2 === 10) {
+                this.bowl1average += this.scores[i].bowl3;
+                this.bowl1count++;
+                this.bowl2average += this.scores[i].bowl2;
+                this.bowl2count++;
+            }
+        }
+    }
+    if (this.bowl2count === 0) {
+        this.bowl2count = 1;
+    }
+    this.bowl1average = (this.bowl1average / this.bowl1count).toFixed(2);
+    this.bowl2average = (this.bowl2average / this.bowl2count).toFixed(2);
+    this.total = this.scores[9].aggtotal;
+}
+Profile.prototype.strikespareCount = function() {
+    for (var i = 0; i < this.scores.length; i++) {
+        if (this.scores[i].bowl1display === 'X') {
+            this.strikes++;
+            this.bowlstrikecount++;
+        }
+        if (this.scores[i].bowl2display === 'X') {
+            this.strikes++;
+        } else if (this.scores[i].bowl2display === '/') {
+            this.spares++;
+            this.bowlsparecount++;
+        }
+        if (this.scores[i].bowl3display === 'X') {
+            this.strikes++;
+        } else if (this.scores[i].bowl3display === '/') {
+            this.spares++;
+        }
+        this.strikebonusave += this.scores[i].strikebonus;
+        this.sparebonusave += this.scores[i].sparebonus;
+    }
+    if (this.bowlstrikecount !== 0) {
+        this.strikebonusave = (this.strikebonusave / this.bowlstrikecount).toFixed(2)
+    }
+    if (this.bowlsparecount !== 0) {
+        this.sparebonusave = (this.sparebonusave / this.bowlsparecount).toFixed(2);
+    }
 }
 Profile.prototype.refreshScores = function () {
     for (var i = 0; i < this.scores.length; i++) {

@@ -1,14 +1,7 @@
-<div ng-controller='myController'>
-<div class='col-xs-3'>
-    <button class='btn btn-success' ng-click='createNewRecord(newName, newEmail)'>Create New Record</button>
-    <button class='btn btn-danger' ng-click='saveNewRecord(scoreData, scoreData.scores)'>Save Record</button>
-    <div class="form-group">
-        <label>Name</label>
-        <input type="text" class="form-control" placeholder="Name" ng-model='newName'>
-    </div>
-    <div class="form-group">
-        <label>Email address</label>
-        <input type="email" class="form-control" placeholder="Email" ng-model='newEmail'>
+<div class='col-xs-12'>
+   <div class = 'col-xs-3'>
+        <button class='btn btn-success' ng-click='createNewRecord($scope.currentUser.displayName, $scope.currentUser.email)'>Create New Record</button>
+        <button class='btn btn-danger' ng-click='saveEditedRecord(scoreData);'>Save Record</button>
     </div>
 </div>
 <div ng-repeat='frame in scoreData.scores'>
@@ -27,17 +20,17 @@
                 </div>
             </div>
             <div class='row' ng-show='frame.activetab === 1'>
-                <div ng-repeat='calc in frame.bowl1Pad' class='col-xs-4 score' ng-click='frame.bowl1scoreConversion(calc); scoreData.refreshScores(); frame.bowl2NumPadMaker(); frame.activateTab()'>
+                <div ng-repeat='calc in frame.bowl1Pad' class='col-xs-4 score' ng-click='frame.bowl1scoreConversion(calc); scoreData.refreshScores(); frame.bowl2NumPadMaker(); frame.activateTab(); saveEditedRecord(scoreData);'>
                     {{calc}}
                 </div>
             </div>
             <div class='row' ng-show='frame.activetab === 2'>
-                <div ng-repeat='calc in frame.bowl2Pad track by $index' class='col-xs-4 score' ng-click='frame.bowl2scoreConversion(calc); scoreData.refreshScores(); frame.bowl3NumPadMaker(); frame.activateTab();'>
+                <div ng-repeat='calc in frame.bowl2Pad track by $index' class='col-xs-4 score' ng-click='frame.bowl2scoreConversion(calc); scoreData.refreshScores(); frame.bowl3NumPadMaker(); frame.activateTab(); saveEditedRecord(scoreData);'>
                     {{calc}}
                 </div>
             </div>
             <div class='row' ng-show='frame.activetab === 3'>
-                <div ng-repeat='calc in frame.bowl3Pad' class='col-xs-4 score' ng-click='frame.bowl3scoreConversion(calc); scoreData.refreshScores();'>
+                <div ng-repeat='calc in frame.bowl3Pad' class='col-xs-4 score' ng-click='frame.bowl3scoreConversion(calc); scoreData.refreshScores(); saveEditedRecord(scoreData);'>
                     {{calc}}
                 </div>
             </div>
@@ -56,5 +49,4 @@
             </div>
         </div>
     </div>
-</div>
 </div>

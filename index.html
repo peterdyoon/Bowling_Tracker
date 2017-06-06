@@ -36,7 +36,9 @@
                 <ul class="nav navbar-nav" ng-controller = 'myNavController'>
                    <li ng-class="{active:tab === 0}"><a ng-href="#pageMain" ng-click = "selectTab(0)">Home</a></li>
                    <li ng-class="{active:tab === 1}"><a ng-href="#createnew" ng-click = "selectTab(1)">Create New</a></li>
-                   <li ng-class="{active:tab === 2}"><a ng-href="#viewrecords" ng-click = "selectTab(2)">View Records</a></li>
+                   <li ng-class="{active:tab === 2}"><a ng-href="#editrecord" ng-click = "selectTab(2)">Edit Your Scores</a></li>
+                   <li ng-class="{active:tab === 4}"><a ng-href="#viewrecords" ng-click = "selectTab(4)">View All Records</a></li>
+                   <li ng-class="{active:tab === 3}"><a ng-href="#signin" ng-click = "selectTab(3)">Profile</a></li>
                 </ul>
             </div>
             <!--/.nav-collapse -->
