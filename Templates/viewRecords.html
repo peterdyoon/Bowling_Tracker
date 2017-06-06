@@ -4,12 +4,17 @@
        <div class="form-group col-xs-12 col-sm-3">
             <label for="filter">Find Bowler:</label>
             <input type="text" class="form-control" placeholder="Input Name" ng-model="myfilter">
+            <br>
+            <button class = 'btn btn-info' ng-click = 'orderfilter = "total"; reverse = !reverse'>Filter by Total</button>
+            <button class = 'btn btn-info' ng-click = 'orderfilter = ""; reverse = !reverse'>Filter by Date</button>
         </div>
+<!--
         <div class="form-group col-xs-12 col-sm-3">
             <label for="filter">Min Score:</label>
-            <input type="text" class="form-control" placeholder="Input Name" ng-model="myscorefilter">
+            <input type="number" class="form-control" placeholder="Input Minimum Score" ng-model="myscorefilter">
         </div>
-        <table class='table table-responsive table-striped table-condensed table-bordered'>
+-->
+        <table class='table table-responsive table-striped table-condensed table-bordered' ng-init = "orderfilter = ''; reverse = false">
             <tr>
                 <th>Name</th>
                 <th>1</th>
@@ -22,9 +27,9 @@
                 <th>8</th>
                 <th>9</th>
                 <th>10</th>
-                <th>Total</th>
+                <th ng-click = 'orderfilter = "total"; reverse = !reverse;'>Total</th>
             </tr>
-            <tr ng-repeat='record in allData | filter:{ gameFinished: "Complete"} | filter:{ Name : myfilter} | filter:{ total : myfilter}'>
+            <tr ng-repeat='record in allData | filter:{ gameFinished: "Complete"} | filter:{ Name : myfilter} | orderBy: orderfilter:reverse'>
                 <td>{{record.Name}}</td>
                 <td ng-repeat='scores in record.scores' ng-click='selectRecord(record, scores)'>
                     <span ng-show='!scores.bowl3tab'></span>
