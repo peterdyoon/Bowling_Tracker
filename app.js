@@ -70,6 +70,7 @@ app.controller("MyAuthCtrl", ["$scope", "Auth", "$firebaseArray", function ($sco
     $scope.nameChange = false;
     $scope.emailChange = false;
     $scope.tempBugSolution = true;
+    $scope.complete = {};
     $scope.createUser = function() {
       $scope.message = null;
       $scope.error = null;
